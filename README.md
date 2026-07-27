@@ -1,312 +1,98 @@
-# ETMP Backend – Project Foundation
+# ETMP — Enterprise Task Management Platform
 
-This repository contains the initial foundation of the **ETMP Backend** built with **FastAPI**, **SQLAlchemy 2.0 (Async)**, **PostgreSQL**, and **Alembic**. The goal of this phase is to establish a production-ready backend architecture before implementing business features such as authentication, user management, projects, and tasks.
-
----
+A production-grade, multi-tenant SaaS backend for organization-based task
+and project management. Built as a flagship backend engineering portfolio
+project, following Clean Architecture principles end-to-end.
 
 ## Tech Stack
 
-- **FastAPI** – High-performance asynchronous web framework
-- **SQLAlchemy 2.0** – Async ORM
-- **PostgreSQL** – Relational database
-- **Alembic** – Database migrations
-- **Pydantic v2** – Configuration management and data validation
-- **asyncpg** – PostgreSQL asynchronous driver
+- **Framework:** FastAPI (fully async)
+- **Database:** PostgreSQL + SQLAlchemy 2.0 (async, via asyncpg)
+- **Migrations:** Alembic (async-compatible)
+- **Validation:** Pydantic v2
+- **Auth:** JWT (access + refresh tokens), bcrypt password hashing
+- **Authorization:** Custom RBAC (Role-Based Access Control)
+- **Testing:** Pytest (planned)
+- **Infra:** Docker (planned)
 
----
+## Architecture
 
-# Project Structure (Current Progress)
+Strict layered architecture with a one-directional dependency flow:
 
-```
+API (routers) → Services (business logic) → Repositories (data access) → Models (ORM)
+
+
+- **Routers** — thin, HTTP concerns only, no business logic
+- **Services** — all business logic, raises domain-specific exceptions
+- **Repositories** — pure data access, no business logic, never commits
+  transactions (that's the Service's responsibility)
+- **Models** — SQLAlchemy ORM, no business logic
+
+Never: business logic in routers, raw SQL in routers, ORM models coupled
+to business logic, hardcoded configuration.
+
+## Multi-Tenancy
+
+Every tenant-scoped table carries a denormalized `organization_id`
+column (not just derived through joins) — enables efficient tenant
+isolation and is a prerequisite for future row-level security. See
+`feature/database-setup` branch README for full schema rationale.
+
+## Project Structure
+
 app/
-├── core/
-│   ├── config.py
-│   └── logging.py
-│
-├── db/
-│   ├── base.py
-│   └── session.py
-│
-└── main.py
+├── api/ # Routers + shared dependencies (auth, RBAC)
+├── core/ # Config, security, logging, exceptions
+├── db/ # Session management, declarative base, seed data
+├── models/ # SQLAlchemy ORM models (18 tables)
+├── schemas/ # Pydantic request/response schemas
+├── repositories/ # Data access layer
+├── services/ # Business logic layer
+├── middleware/ # Custom middleware (planned)
+├── utils/ # Pure, stateless helpers
+├── enums/ # Shared enums and permission constants
+└── tests/ # Automated test suite (planned)
+alembic/ # Database migrations
 
-alembic/
-```
 
----
+## Branch Overview
 
-# Implemented Features
+This project follows a strict one-feature-per-branch workflow, merged
+into `main` once each is verified end-to-end.
 
-## 1. Centralized Configuration Management
+| Branch | Status | What It Adds |
+|---|---|---|
+| `feature/project-setup` | ✅ Merged | Project skeleton, config, logging |
+| `feature/database-setup` | ✅ Merged | Async DB connection, all 18 models, Alembic migrations, RBAC seed data |
+| `feature/authentication` | ✅ Merged | JWT auth, password hashing, register/login/refresh |
+| `feature/authorization-rbac` | ✅ Merged | Role-based permission checking |
+| `feature/user-module` | 🚧 In Progress | User profile management, org-scoped user listing |
 
-Implemented a centralized configuration system using **Pydantic BaseSettings**.
+Each branch has its own README (on that branch) with full implementation
+details, design decisions, and verification notes for that specific step.
 
-### Features
-
-- Reads environment variables from `.env`
-- Strongly typed configuration
-- Environment-based settings
-- Configuration validation
-- Production safety checks
-- Cached settings using `lru_cache`
-- Single source of truth for application configuration
-
-### Configuration Includes
-
-- Application settings
-- Database connection
-- JWT configuration
-- CORS configuration
-- Environment detection
-- Debug mode
-
----
-
-## 2. Production-Ready Logging
-
-Implemented a centralized logging system for the entire application.
-
-### Development Mode
-
-- Human-readable console logs
-- Timestamp
-- Log level
-- Module name
-- Log message
-
-Example:
-
-```
-14:25:01 | INFO | app.api.users | User created successfully
-```
-
-### Production Mode
-
-Structured JSON logging for compatibility with log aggregation systems.
-
-Example:
-
-```json
-{
-  "timestamp": "...",
-  "level": "INFO",
-  "logger": "app.api.users",
-  "message": "User created"
-}
-```
-
-### Logging Features
-
-- Named loggers
-- JSON formatter
-- Environment-aware formatting
-- Exception logging
-- Extra contextual fields
-- Configurable log levels
-- Security best practices (no secrets logged)
-
----
-
-## 3. Async Database Configuration
-
-Configured SQLAlchemy 2.0 using the asynchronous API.
-
-### Components
-
-- Async Engine
-- Async Session Factory
-- Dependency Injection
-- Connection Pool Configuration
-
-### Connection Pool Features
-
-- Connection reuse
-- Automatic connection health check (`pool_pre_ping`)
-- Connection recycling
-- Overflow management
-
----
-
-## 4. SQLAlchemy Declarative Base
-
-Created a centralized declarative base for all ORM models.
-
-### Purpose
-
-- Base class for all database models
-- Shared metadata
-- ORM mapping
-- Migration support
-
----
-
-## 5. Database Session Management
-
-Implemented a reusable asynchronous database session dependency.
-
-### Features
-
-- Async session creation
-- Automatic cleanup
-- Rollback on exceptions
-- Proper session closing
-- Logging during failures
-- Dependency Injection compatible with FastAPI
-
----
-
-## 6. Alembic Integration
-
-Configured Alembic for asynchronous SQLAlchemy.
-
-### Features
-
-- Async migration support
-- Autogenerated migrations
-- Online migrations
-- Offline migrations
-- Automatic metadata discovery
-- Uses application configuration instead of duplicate database URLs
-
----
-
-# Architecture Decisions
-
-The project follows several production-level backend practices:
-
-- Centralized configuration
-- Dependency Injection
-- Separation of concerns
-- Async-first architecture
-- Environment-based configuration
-- Production-safe logging
-- Database migration versioning
-- Clean project structure
-
----
-
-# Current Database Flow
-
-```
-Client Request
-       │
-       ▼
-FastAPI Route
-       │
-       ▼
-Dependency Injection
-       │
-       ▼
-Async Database Session
-       │
-       ▼
-SQLAlchemy Async Engine
-       │
-       ▼
-PostgreSQL
-```
-
----
-
-# Logging Flow
-
-```
-Application
-      │
-      ▼
-Logger
-      │
-      ▼
-Formatter
-      │
-      ├──────────────┐
-      │              │
-Development     Production
-      │              │
-Readable      JSON Logs
-      │              │
-Console     Log Aggregator
-```
-
----
-
-# Migration Workflow
-
-Create a migration:
+## Local Setup
 
 ```bash
-alembic revision --autogenerate -m "migration_message"
+cp .env.example .env   # then fill in real values
+python -m venv venv
+venv\Scripts\Activate.ps1   # Windows PowerShell
+pip install -r requirements-dev.txt
+python -m app.db.seed       # seed RBAC permissions/roles
+alembic upgrade head        # apply migrations
+uvicorn app.main:app --reload
 ```
 
-Apply migrations:
+API docs available at: `http://127.0.0.1:8000/api/v1/docs`
 
-```bash
-alembic upgrade head
-```
+Requires a running local PostgreSQL instance matching `DATABASE_URL` in
+`.env`. Dockerized setup is planned for a later stage.
 
-Rollback one migration:
+## Roadmap
 
-```bash
-alembic downgrade -1
-```
-
----
-
-# Current Status
-
-✅ Project setup completed
-
-✅ Environment configuration
-
-✅ Logging system
-
-✅ Async database connection
-
-✅ SQLAlchemy base
-
-✅ Session management
-
-✅ Alembic configuration
-
-⏳ ORM Models
-
-⏳ Authentication
-
-⏳ Repository Layer
-
-⏳ Service Layer
-
-⏳ API Endpoints
-
-⏳ Authorization (RBAC)
-
-⏳ Middleware
-
-⏳ Testing
-
----
-
-# Next Milestone
-
-The next phase of the project is implementing the database models, followed by migrations, schemas, repositories, services, and REST API endpoints.
-
----
-
-## Learning Objectives Achieved
-
-- FastAPI project architecture
-- Pydantic Settings
-- Environment management
-- SQLAlchemy 2.0 Async
-- Async database sessions
-- Dependency Injection
-- Connection pooling
-- Structured logging
-- Alembic migrations
-- Clean backend architecture
-
----
-
-## Author
-
-**Sehrish Fatima**
-
+Project Setup → Git Strategy → Environment Config → Logging →
+Database Connection → Alembic → **Authentication** → **Authorization (RBAC)**
+→ *User Module* → Organization Module → Team Module → Project Module →
+Task Module → Comments → Attachments → Notifications → Activity Logs →
+Search/Filtering/Pagination → Dashboard APIs → Middleware/Exception
+Handling → Testing → Docker → Production Optimization → Deployment
