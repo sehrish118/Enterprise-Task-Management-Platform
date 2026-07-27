@@ -1,0 +1,34 @@
+from fastapi import FastAPI
+
+from app.core.config import settings
+from app.core.logging import configure_logging, get_logger
+from app.api.v1 import auth
+
+configure_logging()
+
+logger = get_logger(__name__)
+
+
+def create_app() -> FastAPI:
+    app = FastAPI(
+        title=settings.APP_NAME,
+        debug=settings.DEBUG,
+        openapi_url=f"{settings.API_V1_PREFIX}/openapi.json",
+        docs_url=f"{settings.API_V1_PREFIX}/docs",
+    )
+
+    # Routers, middleware, and exception handlers will be registered here
+    # as they're built — empty at this stage of the roadmap.
+    app.include_router(auth.router, prefix=settings.API_V1_PREFIX)
+
+    logger.info("Application configured", extra={"env": settings.APP_ENV})
+    return app
+
+
+app = create_app()
+
+
+@app.get("/health", tags=["health"])
+def health_check() -> dict[str, str]:
+
+    return {"status": "ok", "app": settings.APP_NAME}
