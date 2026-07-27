@@ -12,7 +12,10 @@ import uuid
 
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from notification import Notification
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from notification import Notification
 from app.db.base import Base
 
 

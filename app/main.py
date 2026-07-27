@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from app.core.config import settings
 from app.core.logging import configure_logging, get_logger
 from app.api.v1 import auth
+from app.api.v1 import users
 
 configure_logging()
 
@@ -20,6 +21,8 @@ def create_app() -> FastAPI:
     # Routers, middleware, and exception handlers will be registered here
     # as they're built — empty at this stage of the roadmap.
     app.include_router(auth.router, prefix=settings.API_V1_PREFIX)
+
+    app.include_router(users.router, prefix=settings.API_V1_PREFIX)
 
     logger.info("Application configured", extra={"env": settings.APP_ENV})
     return app

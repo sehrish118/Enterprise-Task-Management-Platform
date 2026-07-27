@@ -12,6 +12,7 @@ import uuid
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.models.organization_member import OrganizationMember
 from app.models.user import User
 
 
@@ -36,3 +37,32 @@ class UserRepository:
         self.session.add(user)
         await self.session.flush()  # assigns user.id without committing
         return user
+
+    async def update(self, user: User, *, full_name: str | None = None) -> User:
+        if full_name is not None:
+            user.full_name = full_name
+        await self.session.flush()
+        return user
+
+    async def update_password(self, user: User, *, new_password_hash: str) -> User:
+        user.password_hash = new_password_hash
+        await self.session.flush()
+        return user
+
+    async def deactivate(self, user: User) -> User:
+        user.is_active = False
+        await self.session.flush()
+        return user
+
+    async def list_by_organization(self, organization_id: uuid.UUID) -> list[User]:
+        stmt = (
+            select(User)
+            .join(OrganizationMember, OrganizationMember.user_id == User.id)
+            .where(
+                OrganizationMember.organization_id == organization_id,
+                OrganizationMember.deleted_at.is_(None),
+                User.deleted_at.is_(None),
+            )
+        )
+        result = await self.session.execute(stmt)
+        return list(result.scalars().all())

@@ -9,8 +9,13 @@ from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
-from task import Task
-from user import User
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from task import Task
+    from user import User
+
 
 class Attachment(Base):
     __tablename__ = "attachments"

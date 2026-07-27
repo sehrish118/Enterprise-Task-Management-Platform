@@ -15,9 +15,14 @@ from datetime import datetime
 from sqlalchemy import Boolean, DateTime, ForeignKey, String, Text, func
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from organization import Organization
-from user import User
-from notification_type import NotificationType
+
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from organization import Organization
+    from user import User
+    from notification_type import NotificationType
 from app.db.base import Base
 
 
