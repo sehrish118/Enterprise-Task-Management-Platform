@@ -66,7 +66,8 @@ into `main` once each is verified end-to-end.
 | `feature/database-setup` | ✅ Merged | Async DB connection, all 18 models, Alembic migrations, RBAC seed data |
 | `feature/authentication` | ✅ Merged | JWT auth, password hashing, register/login/refresh |
 | `feature/authorization-rbac` | ✅ Merged | Role-based permission checking |
-| `feature/user-module` | 🚧 In Progress | User profile management, org-scoped user listing |
+| `feature/user-module` | ✅ Merged | Profile management, password change, org-scoped user listing, deactivation |
+| `feature/organization-module` | 🚧 Next | Organization CRUD, member invitations |
 
 Each branch has its own README (on that branch) with full implementation
 details, design decisions, and verification notes for that specific step.
@@ -92,7 +93,7 @@ Requires a running local PostgreSQL instance matching `DATABASE_URL` in
 
 Project Setup → Git Strategy → Environment Config → Logging →
 Database Connection → Alembic → **Authentication** → **Authorization (RBAC)**
-→ *User Module* → Organization Module → Team Module → Project Module →
+→ **User Module** → *Organization Module* → Team Module → Project Module →
 Task Module → Comments → Attachments → Notifications → Activity Logs →
 Search/Filtering/Pagination → Dashboard APIs → Middleware/Exception
 Handling → Testing → Docker → Production Optimization → Deployment
