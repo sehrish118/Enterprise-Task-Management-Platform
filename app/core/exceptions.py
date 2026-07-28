@@ -25,3 +25,19 @@ class InvalidTokenError(DomainError):
 
 class UserNotFoundError(DomainError):
     """Raised when a referenced user doesn't exist or is soft-deleted."""
+
+
+class OrganizationNotFoundError(DomainError):
+    """Raised when a referenced organization doesn't exist or is soft-deleted."""
+
+
+class SlugAlreadyExistsError(DomainError):
+    """Raised when creating an organization with a slug that's already taken."""
+
+
+class RoleNotFoundError(DomainError):
+    """Raised when a role name doesn't match any known role."""
+
+
+class UserAlreadyMemberError(DomainError):
+    """Raised when adding a user to an organization they're already part of."""
