@@ -67,7 +67,8 @@ into `main` once each is verified end-to-end.
 | `feature/authentication` | ✅ Merged | JWT auth, password hashing, register/login/refresh |
 | `feature/authorization-rbac` | ✅ Merged | Role-based permission checking |
 | `feature/user-module` | ✅ Merged | Profile management, password change, org-scoped user listing, deactivation |
-| `feature/organization-module` | 🚧 Next | Organization CRUD, member invitations |
+| `feature/organization-module` | ✅ Merged | Organization CRUD, atomic owner creation, member invitations |
+| `feature/team-module` | 🚧 Next | Team CRUD within organizations, team member management |
 
 Each branch has its own README (on that branch) with full implementation
 details, design decisions, and verification notes for that specific step.
