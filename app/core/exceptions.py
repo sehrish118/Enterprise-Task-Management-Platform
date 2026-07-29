@@ -41,3 +41,15 @@ class RoleNotFoundError(DomainError):
 
 class UserAlreadyMemberError(DomainError):
     """Raised when adding a user to an organization they're already part of."""
+
+
+class TeamNotFoundError(DomainError):
+    """Raised when a referenced team doesn't exist or is soft-deleted."""
+
+
+class TeamNameAlreadyExistsError(DomainError):
+    """Raised when creating a team with a name already used in the org."""
+
+
+class UserAlreadyTeamMemberError(DomainError):
+    """Raised when adding a user to a team they're already part of."""

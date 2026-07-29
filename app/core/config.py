@@ -68,7 +68,10 @@ class Settings(BaseSettings):
         return self
 
 
-@lru_cache
+@lru_cache 
+#This caches settings object in memory. So, in entire project, 
+#when ever get_settings() will 
+#be called, we can fastly access the settings. No need to go into .env again and again.
 def get_settings() -> Settings:
     
     return Settings()  # type: ignore[call-arg]
