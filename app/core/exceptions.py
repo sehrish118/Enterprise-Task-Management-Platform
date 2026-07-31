@@ -53,3 +53,15 @@ class TeamNameAlreadyExistsError(DomainError):
 
 class UserAlreadyTeamMemberError(DomainError):
     """Raised when adding a user to a team they're already part of."""
+
+
+class ProjectNotFoundError(DomainError):
+    """Raised when a referenced project doesn't exist or is soft-deleted."""
+
+
+class ProjectNameAlreadyExistsError(DomainError):
+    """Raised when creating a project with a name already used in the org."""
+
+
+class UserAlreadyProjectMemberError(DomainError):
+    """Raised when adding a user to a project they're already part of."""

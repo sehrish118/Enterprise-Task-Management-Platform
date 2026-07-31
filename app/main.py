@@ -6,6 +6,7 @@ from app.api.v1 import auth
 from app.api.v1 import users
 from app.api.v1 import organizations
 from app.api.v1 import teams
+from app.api.v1 import projects
 
 configure_logging()
 
@@ -29,6 +30,8 @@ def create_app() -> FastAPI:
     app.include_router(organizations.router, prefix=settings.API_V1_PREFIX)
 
     app.include_router(teams.router, prefix=settings.API_V1_PREFIX)
+
+    app.include_router(projects.router, prefix=settings.API_V1_PREFIX)
 
     logger.info("Application configured", extra={"env": settings.APP_ENV})
     return app
