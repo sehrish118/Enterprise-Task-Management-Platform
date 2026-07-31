@@ -1,0 +1,122 @@
+import uuid
+from datetime import datetime
+
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.core.exceptions import (
+    TaskNotFoundError,
+    TaskStatusNotFoundError,
+    UserAlreadyAssignedError,
+    UserNotFoundError,
+)
+from app.models.task import Task
+from app.models.task_assignee import TaskAssignee
+from app.repositories.task_repository import TaskRepository
+from app.repositories.task_status_repository import TaskStatusRepository
+from app.repositories.user_repository import UserRepository
+
+
+class TaskService:
+    def __init__(self, session: AsyncSession) -> None:
+        self.session = session
+        self.task_repo = TaskRepository(session)
+        self.status_repo = TaskStatusRepository(session)
+        self.user_repo = UserRepository(session)
+
+    async def create_task(
+        self,
+        *,
+        organization_id: uuid.UUID,
+        project_id: uuid.UUID,
+        status_id: uuid.UUID,
+        title: str,
+        description: str | None,
+        priority: str,
+        parent_task_id: uuid.UUID | None,
+        due_date: datetime | None,
+        created_by: uuid.UUID,
+    ) -> Task:
+        status = await self.status_repo.get_by_id(status_id)
+        if status is None:
+            raise TaskStatusNotFoundError(f"Task status {status_id} not found")
+
+        task = await self.task_repo.create(
+            organization_id=organization_id,
+            project_id=project_id,
+            status_id=status_id,
+            title=title,
+            description=description,
+            priority=priority,
+            parent_task_id=parent_task_id,
+            due_date=due_date,
+            created_by=created_by,
+        )
+        await self.session.commit()
+        return task
+
+    async def get_task(self, task_id: uuid.UUID) -> Task:
+        task = await self.task_repo.get_by_id(task_id)
+        if task is None:
+            raise TaskNotFoundError(f"Task {task_id} not found")
+        return task
+
+    async def update_task(
+        self,
+        *,
+        task_id: uuid.UUID,
+        title: str | None,
+        description: str | None,
+        status_id: uuid.UUID | None,
+        priority: str | None,
+        due_date: datetime | None,
+    ) -> Task:
+        task = await self.get_task(task_id)
+
+        if status_id is not None:
+            status = await self.status_repo.get_by_id(status_id)
+            if status is None:
+                raise TaskStatusNotFoundError(f"Task status {status_id} not found")
+
+        task = await self.task_repo.update(
+            task,
+            title=title,
+            description=description,
+            status_id=status_id,
+            priority=priority,
+            due_date=due_date,
+        )
+        await self.session.commit()
+        return task
+
+    async def delete_task(self, task_id: uuid.UUID) -> None:
+        task = await self.get_task(task_id)
+        await self.task_repo.soft_delete(task)
+        await self.session.commit()
+
+    async def list_tasks(self, project_id: uuid.UUID) -> list[Task]:
+        return await self.task_repo.list_by_project(project_id)
+
+    async def assign_user(
+        self, *, organization_id: uuid.UUID, task_id: uuid.UUID, email: str
+    ) -> TaskAssignee:
+        await self.get_task(task_id)
+
+        user = await self.user_repo.get_by_email(email)
+        if user is None:
+            raise UserNotFoundError(f"No user registered with email '{email}'")
+
+        existing = await self.task_repo.get_assignment(task_id=task_id, user_id=user.id)
+        if existing is not None:
+            raise UserAlreadyAssignedError(
+                f"'{email}' is already assigned to this task"
+            )
+
+        assignee = await self.task_repo.assign_user(
+            organization_id=organization_id, task_id=task_id, user_id=user.id
+        )
+        await self.session.commit()
+        return assignee
+
+    async def list_assignees(self, task_id: uuid.UUID) -> list[TaskAssignee]:
+        await self.get_task(task_id)
+        return await self.task_repo.list_assignees(task_id)

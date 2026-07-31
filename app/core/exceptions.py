@@ -65,3 +65,19 @@ class ProjectNameAlreadyExistsError(DomainError):
 
 class UserAlreadyProjectMemberError(DomainError):
     """Raised when adding a user to a project they're already part of."""
+
+
+class TaskNotFoundError(DomainError):
+    """Raised when a referenced task doesn't exist or is soft-deleted."""
+
+
+class TaskStatusNotFoundError(DomainError):
+    """Raised when a referenced task status doesn't exist."""
+
+
+class TaskStatusAlreadyExistsError(DomainError):
+    """Raised when creating a task status with a name already used in the org."""
+
+
+class UserAlreadyAssignedError(DomainError):
+    """Raised when assigning a user to a task they're already assigned to."""
