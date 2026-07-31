@@ -81,3 +81,15 @@ class TaskStatusAlreadyExistsError(DomainError):
 
 class UserAlreadyAssignedError(DomainError):
     """Raised when assigning a user to a task they're already assigned to."""
+
+
+class CommentNotFoundError(DomainError):
+    """Raised when a referenced comment doesn't exist or is soft-deleted."""
+
+
+class NotCommentOwnerError(DomainError):
+    """Raised when a user tries to edit/delete another user's comment."""
+
+
+class AttachmentNotFoundError(DomainError):
+    """Raised when a referenced attachment doesn't exist or is soft-deleted."""
