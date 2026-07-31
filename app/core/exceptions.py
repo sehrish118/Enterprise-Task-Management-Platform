@@ -93,3 +93,11 @@ class NotCommentOwnerError(DomainError):
 
 class AttachmentNotFoundError(DomainError):
     """Raised when a referenced attachment doesn't exist or is soft-deleted."""
+
+
+class NotificationNotFoundError(DomainError):
+    """Raised when a referenced notification doesn't exist."""
+
+
+class NotYourNotificationError(DomainError):
+    """Raised when a user tries to mark another user's notification as read."""

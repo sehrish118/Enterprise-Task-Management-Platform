@@ -11,6 +11,7 @@ from app.enums.permissions import Permissions
 from app.models.permission import Permission
 from app.models.role import Role
 from app.models.role_permission import RolePermission
+from app.models.notification_type import NotificationType
 
 logger = get_logger(__name__)
 
@@ -75,10 +76,31 @@ async def seed_system_roles(
                 session.add(RolePermission(role_id=role.id, permission_id=perm.id))
 
 
+NOTIFICATION_TYPES = {
+    "TASK_ASSIGNED": "A task was assigned to you",
+    "TASK_UPDATED": "A task you're involved in was updated",
+    "TASK_COMPLETED": "A task was marked complete",
+    "COMMENT_ADDED": "A new comment was added to a task",
+    "MENTION": "You were mentioned in a comment",
+    "PROJECT_INVITATION": "You were added to a project",
+}
+
+
+async def seed_notification_types(session) -> None:
+    result = await session.execute(select(NotificationType))
+    existing = {nt.code for nt in result.scalars().all()}
+
+    for code, description in NOTIFICATION_TYPES.items():
+        if code not in existing:
+            session.add(NotificationType(code=code, description=description))
+            logger.info("Seeding notification type", extra={"type": code})
+
+
 async def run_seed() -> None:
     async with async_session_local() as session:
         permissions_by_name = await seed_permissions(session)
         await seed_system_roles(session, permissions_by_name)
+        await seed_notification_types(session)
         await session.commit()
         logger.info("Seed complete.")
 

@@ -99,7 +99,7 @@ class TaskService:
     async def assign_user(
         self, *, organization_id: uuid.UUID, task_id: uuid.UUID, email: str
     ) -> TaskAssignee:
-        await self.get_task(task_id)
+        task = await self.get_task(task_id)
 
         user = await self.user_repo.get_by_email(email)
         if user is None:
@@ -114,6 +114,28 @@ class TaskService:
         assignee = await self.task_repo.assign_user(
             organization_id=organization_id, task_id=task_id, user_id=user.id
         )
+
+        # Fire notification + activity log — same transaction, same commit
+        from app.services.notification_service import NotificationService
+        from app.services.activity_log_service import ActivityLogService
+
+        await NotificationService(self.session).notify(
+            organization_id=organization_id,
+            user_id=user.id,
+            type_code="TASK_ASSIGNED",
+            title="You were assigned a task",
+            message=f"You were assigned to task: {task.title}",
+            entity_type="task",
+            entity_id=task_id,
+        )
+        await ActivityLogService(self.session).log(
+            organization_id=organization_id,
+            user_id=user.id,
+            action="task_assigned",
+            entity_type="task",
+            entity_id=task_id,
+        )
+
         await self.session.commit()
         return assignee
 

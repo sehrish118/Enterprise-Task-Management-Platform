@@ -9,7 +9,7 @@ from app.api.v1 import teams
 from app.api.v1 import projects
 from app.api.v1 import task_statuses, tasks
 from app.api.v1 import attachments, comments
-
+from app.api.v1 import activity_logs, notifications
 
 configure_logging()
 
@@ -43,6 +43,10 @@ def create_app() -> FastAPI:
     app.include_router(comments.router, prefix=settings.API_V1_PREFIX)
 
     app.include_router(attachments.router, prefix=settings.API_V1_PREFIX)
+
+    app.include_router(notifications.router, prefix=settings.API_V1_PREFIX)
+
+    app.include_router(activity_logs.router, prefix=settings.API_V1_PREFIX)
 
     logger.info("Application configured", extra={"env": settings.APP_ENV})
     return app
