@@ -70,7 +70,10 @@ into `main` once each is verified end-to-end.
 | `feature/organization-module` | ✅ Merged | Organization CRUD, atomic owner creation, member invitations |
 | `feature/team-module` | ✅ Merged | Team CRUD, member management, 
 RBAC-gated |
-| `feature/project-module` | ✅ Next | Project CRUD, project members |
+| `feature/project-module` | ✅ Merged | Project CRUD, project members |
+| `feature/task-module` | ✅ Merged | Task statuses, task CRUD, task assignment |
+| `feature/comments-attachments` | 🚧 Next | Task comments (threaded), file attachments |
+
 
 
 Each branch has its own README (on that branch) with full implementation
