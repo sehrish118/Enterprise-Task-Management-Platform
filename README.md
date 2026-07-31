@@ -73,9 +73,8 @@ RBAC-gated |
 | `feature/project-module` | ✅ Merged | Project CRUD, project members |
 | `feature/task-module` | ✅ Merged | Task statuses, task CRUD, task assignment |
 | `feature/comments-attachments` | ✅ Merged | Threaded comments (ownership-guarded edit/delete), attachment metadata |
-| `feature/notifications-activity-logs` | 🚧 Next | User notifications, organization-wide activity audit trail |
-
-
+| `feature/notifications-activity-logs` | ✅ Merged | Auto-triggered notifications, org-wide activity audit trail |
+| `feature/search-filtering-pagination` | 🚧 Next | Search, filtering, and pagination for list endpoints |
 
 Each branch has its own README (on that branch) with full implementation
 details, design decisions, and verification notes for that specific step.
