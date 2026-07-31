@@ -68,8 +68,10 @@ into `main` once each is verified end-to-end.
 | `feature/authorization-rbac` | ✅ Merged | Role-based permission checking |
 | `feature/user-module` | ✅ Merged | Profile management, password change, org-scoped user listing, deactivation |
 | `feature/organization-module` | ✅ Merged | Organization CRUD, atomic owner creation, member invitations |
-| `feature/team-module` | ✅ Merged | Team CRUD, member management, RBAC-gated |
-| `feature/project-module` | 🚧 Next | Project CRUD, project members |
+| `feature/team-module` | ✅ Merged | Team CRUD, member management, 
+RBAC-gated |
+| `feature/project-module` | ✅ Next | Project CRUD, project members |
+
 
 Each branch has its own README (on that branch) with full implementation
 details, design decisions, and verification notes for that specific step.
