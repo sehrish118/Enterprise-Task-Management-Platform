@@ -73,11 +73,43 @@ class TaskRepository:
         task.deleted_at = datetime.now(timezone.utc)
         await self.session.flush()
 
-    async def list_by_project(self, project_id: uuid.UUID) -> list[Task]:
-        result = await self.session.execute(
-            select(Task).where(Task.project_id == project_id, Task.deleted_at.is_(None))
+    async def list_by_project(
+        self,
+        project_id: uuid.UUID,
+        *,
+        status_id: uuid.UUID | None = None,
+        priority: str | None = None,
+        search: str | None = None,
+        offset: int = 0,
+        limit: int = 20,
+    ) -> tuple[list[Task], int]:
+        from sqlalchemy import func, or_
+
+        conditions = [Task.project_id == project_id, Task.deleted_at.is_(None)]
+        if status_id is not None:
+            conditions.append(Task.status_id == status_id)
+        if priority is not None:
+            conditions.append(Task.priority == priority)
+        if search is not None:
+            conditions.append(
+                or_(
+                    Task.title.ilike(f"%{search}%"),
+                    Task.description.ilike(f"%{search}%"),
+                )
+            )
+
+        count_stmt = select(func.count()).select_from(Task).where(*conditions)
+        total = (await self.session.execute(count_stmt)).scalar_one()
+
+        stmt = (
+            select(Task)
+            .where(*conditions)
+            .order_by(Task.created_at.desc())
+            .offset(offset)
+            .limit(limit)
         )
-        return list(result.scalars().all())
+        result = await self.session.execute(stmt)
+        return list(result.scalars().all()), total
 
     async def assign_user(
         self, *, organization_id: uuid.UUID, task_id: uuid.UUID, user_id: uuid.UUID

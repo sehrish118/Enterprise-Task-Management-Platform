@@ -93,8 +93,25 @@ class TaskService:
         await self.task_repo.soft_delete(task)
         await self.session.commit()
 
-    async def list_tasks(self, project_id: uuid.UUID) -> list[Task]:
-        return await self.task_repo.list_by_project(project_id)
+    async def list_tasks(
+        self,
+        project_id: uuid.UUID,
+        *,
+        status_id: uuid.UUID | None = None,
+        priority: str | None = None,
+        search: str | None = None,
+        page: int = 1,
+        page_size: int = 20,
+    ) -> tuple[list[Task], int]:
+        offset = (page - 1) * page_size
+        return await self.task_repo.list_by_project(
+            project_id,
+            status_id=status_id,
+            priority=priority,
+            search=search,
+            offset=offset,
+            limit=page_size,
+        )
 
     async def assign_user(
         self, *, organization_id: uuid.UUID, task_id: uuid.UUID, email: str

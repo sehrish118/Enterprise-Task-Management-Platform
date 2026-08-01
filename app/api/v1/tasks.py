@@ -22,6 +22,10 @@ from app.schemas.task import (
     TaskUpdate,
 )
 from app.services.task_service import TaskService
+import math
+
+from app.schemas.pagination import PaginatedResponse
+
 
 router = APIRouter(
     prefix="/organizations/{organization_id}/projects/{project_id}/tasks",
@@ -58,15 +62,33 @@ async def create_task(
     return TaskRead.model_validate(task)
 
 
-@router.get("", response_model=list[TaskRead])
+@router.get("", response_model=PaginatedResponse[TaskRead])
 async def list_tasks(
     organization_id: uuid.UUID,
     project_id: uuid.UUID,
     db: Annotated[AsyncSession, Depends(get_db)],
-) -> list[TaskRead]:
+    status_id: uuid.UUID | None = None,
+    priority: str | None = None,
+    search: str | None = None,
+    page: int = 1,
+    page_size: int = 20,
+) -> PaginatedResponse[TaskRead]:
     service = TaskService(db)
-    tasks = await service.list_tasks(project_id)
-    return [TaskRead.model_validate(t) for t in tasks]
+    tasks, total = await service.list_tasks(
+        project_id,
+        status_id=status_id,
+        priority=priority,
+        search=search,
+        page=page,
+        page_size=page_size,
+    )
+    return PaginatedResponse(
+        items=[TaskRead.model_validate(t) for t in tasks],
+        total=total,
+        page=page,
+        page_size=page_size,
+        total_pages=math.ceil(total / page_size) if total > 0 else 0,
+    )
 
 
 @router.get("/{task_id}", response_model=TaskRead)
