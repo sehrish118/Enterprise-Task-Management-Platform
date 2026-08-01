@@ -77,7 +77,9 @@ RBAC-gated |
 | `feature/search-filtering-pagination` | ✅ Merged | Search, filtering, pagination on task listing |
 | `feature/dashboard-apis` | ✅ Merged | Personal dashboard (assigned/overdue tasks, notifications), organization dashboard (project/task/member stats) |
 | `feature/middleware-exception-handling` | ✅ Merged | Request logging middleware, in-memory rate limiting |
-| `feature/global-exception-handling` | 🚧 Next | Centralized DomainError → HTTP status code mapping |
+| `feature/global-exception-handling` | ✅ Merged | Centralized DomainError → HTTP status mapping, safety-net 500 handler |
+| `feature/testing` | 🚧 Next | Pytest unit + integration test suite |
+
 
 Each branch has its own README (on that branch) with full implementation
 details, design decisions, and verification notes for that specific step.
