@@ -76,7 +76,8 @@ RBAC-gated |
 | `feature/notifications-activity-logs` | ✅ Merged | Auto-triggered notifications, org-wide activity audit trail |
 | `feature/search-filtering-pagination` | ✅ Merged | Search, filtering, pagination on task listing |
 | `feature/dashboard-apis` | ✅ Merged | Personal dashboard (assigned/overdue tasks, notifications), organization dashboard (project/task/member stats) |
-| `feature/middleware-exception-handling` | 🚧 Next | Global exception handler, request logging middleware |
+| `feature/middleware-exception-handling` | ✅ Merged | Request logging middleware, in-memory rate limiting |
+| `feature/global-exception-handling` | 🚧 Next | Centralized DomainError → HTTP status code mapping |
 
 Each branch has its own README (on that branch) with full implementation
 details, design decisions, and verification notes for that specific step.
