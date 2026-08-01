@@ -11,6 +11,8 @@ from app.api.v1 import task_statuses, tasks
 from app.api.v1 import attachments, comments
 from app.api.v1 import activity_logs, notifications
 from app.api.v1 import dashboard
+from app.middleware.rate_limit import RateLimitMiddleware
+from app.middleware.request_logging import RequestLoggingMiddleware
 
 configure_logging()
 
@@ -25,6 +27,8 @@ def create_app() -> FastAPI:
         docs_url=f"{settings.API_V1_PREFIX}/docs",
     )
 
+    app.add_middleware(RateLimitMiddleware)
+    app.add_middleware(RequestLoggingMiddleware)
     # Routers, middleware, and exception handlers will be registered here
     # as they're built — empty at this stage of the roadmap.
     app.include_router(auth.router, prefix=settings.API_V1_PREFIX)
@@ -50,6 +54,7 @@ def create_app() -> FastAPI:
     app.include_router(activity_logs.router, prefix=settings.API_V1_PREFIX)
 
     app.include_router(dashboard.router, prefix=settings.API_V1_PREFIX)
+
     logger.info("Application configured", extra={"env": settings.APP_ENV})
     return app
 
