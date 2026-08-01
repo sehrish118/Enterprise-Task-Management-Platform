@@ -47,16 +47,16 @@ async def change_my_password(
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> None:
     service = UserService(db)
-    try:
-        await service.change_password(
-            current_user=current_user,
-            current_password=payload.current_password,
-            new_password=payload.new_password,
-        )
-    except InvalidCredentialsError as e:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e)
-        ) from e
+    # try:
+    await service.change_password(
+        current_user=current_user,
+        current_password=payload.current_password,
+        new_password=payload.new_password,
+    )
+    # except InvalidCredentialsError as e:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e)
+    #     ) from e
 
 
 @router.get("/organizations/{organization_id}/users", response_model=list[UserRead])
@@ -82,14 +82,14 @@ async def deactivate_user(
     _: Annotated[None, Depends(require_permission(Permissions.ORG_MANAGE_MEMBERS))],
 ) -> UserRead:
     service = UserService(db)
-    try:
-        user = await service.deactivate_user(
-            target_user_id=user_id, requesting_user_id=current_user.id
-        )
-    except UserNotFoundError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
-    except InvalidCredentialsError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
-        ) from e
+    # try:
+    user = await service.deactivate_user(
+        target_user_id=user_id, requesting_user_id=current_user.id
+    )
+    # except UserNotFoundError as e:
+    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+    # except InvalidCredentialsError as e:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
+    #     ) from e
     return UserRead.model_validate(user)

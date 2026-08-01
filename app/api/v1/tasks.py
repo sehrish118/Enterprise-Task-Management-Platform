@@ -43,22 +43,22 @@ async def create_task(
     _: Annotated[None, Depends(require_permission(Permissions.TASK_CREATE))],
 ) -> TaskRead:
     service = TaskService(db)
-    try:
-        task = await service.create_task(
-            organization_id=organization_id,
-            project_id=project_id,
-            status_id=payload.status_id,
-            title=payload.title,
-            description=payload.description,
-            priority=payload.priority,
-            parent_task_id=payload.parent_task_id,
-            due_date=payload.due_date,
-            created_by=current_user.id,
-        )
-    except TaskStatusNotFoundError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
-        ) from e
+    # try:
+    task = await service.create_task(
+        organization_id=organization_id,
+        project_id=project_id,
+        status_id=payload.status_id,
+        title=payload.title,
+        description=payload.description,
+        priority=payload.priority,
+        parent_task_id=payload.parent_task_id,
+        due_date=payload.due_date,
+        created_by=current_user.id,
+    )
+    # except TaskStatusNotFoundError as e:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
+    #     ) from e
     return TaskRead.model_validate(task)
 
 
@@ -99,10 +99,10 @@ async def get_task(
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> TaskRead:
     service = TaskService(db)
-    try:
-        task = await service.get_task(task_id)
-    except TaskNotFoundError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+    # try:
+    task = await service.get_task(task_id)
+    # except TaskNotFoundError as e:
+    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
     return TaskRead.model_validate(task)
 
 
@@ -116,21 +116,21 @@ async def update_task(
     _: Annotated[None, Depends(require_permission(Permissions.TASK_UPDATE))],
 ) -> TaskRead:
     service = TaskService(db)
-    try:
-        task = await service.update_task(
-            task_id=task_id,
-            title=payload.title,
-            description=payload.description,
-            status_id=payload.status_id,
-            priority=payload.priority,
-            due_date=payload.due_date,
-        )
-    except TaskNotFoundError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
-    except TaskStatusNotFoundError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
-        ) from e
+    # try:
+    task = await service.update_task(
+        task_id=task_id,
+        title=payload.title,
+        description=payload.description,
+        status_id=payload.status_id,
+        priority=payload.priority,
+        due_date=payload.due_date,
+    )
+    # except TaskNotFoundError as e:
+    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+    # except TaskStatusNotFoundError as e:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
+    #     ) from e
     return TaskRead.model_validate(task)
 
 
@@ -143,10 +143,10 @@ async def delete_task(
     _: Annotated[None, Depends(require_permission(Permissions.TASK_DELETE))],
 ) -> None:
     service = TaskService(db)
-    try:
-        await service.delete_task(task_id)
-    except TaskNotFoundError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+    # try:
+    await service.delete_task(task_id)
+    # except TaskNotFoundError as e:
+    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
 
 
 @router.post(
@@ -163,18 +163,18 @@ async def assign_task(
     _: Annotated[None, Depends(require_permission(Permissions.TASK_ASSIGN))],
 ) -> TaskAssigneeRead:
     service = TaskService(db)
-    try:
-        assignee = await service.assign_user(
-            organization_id=organization_id, task_id=task_id, email=payload.email
-        )
-    except TaskNotFoundError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
-    except UserNotFoundError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
-    except UserAlreadyAssignedError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
-        ) from e
+    # try:
+    assignee = await service.assign_user(
+        organization_id=organization_id, task_id=task_id, email=payload.email
+    )
+    # except TaskNotFoundError as e:
+    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+    # except UserNotFoundError as e:
+    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+    # except UserAlreadyAssignedError as e:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
+    #     ) from e
     return TaskAssigneeRead.model_validate(assignee)
 
 
@@ -186,8 +186,8 @@ async def list_task_assignees(
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> list[TaskAssigneeRead]:
     service = TaskService(db)
-    try:
-        assignees = await service.list_assignees(task_id)
-    except TaskNotFoundError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+    # try:
+    assignees = await service.list_assignees(task_id)
+    # except TaskNotFoundError as e:
+    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
     return [TaskAssigneeRead.model_validate(a) for a in assignees]

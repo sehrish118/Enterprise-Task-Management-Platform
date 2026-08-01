@@ -33,12 +33,10 @@ async def create_team(
     _: Annotated[None, Depends(require_permission(Permissions.TEAM_CREATE))],
 ) -> TeamRead:
     service = TeamService(db)
-    try:
-        team = await service.create_team(
-            organization_id=organization_id, name=payload.name
-        )
-    except TeamNameAlreadyExistsError as e:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e)) from e
+    # try:
+    team = await service.create_team(organization_id=organization_id, name=payload.name)
+    # except TeamNameAlreadyExistsError as e:
+    #     raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e)) from e
     return TeamRead.model_validate(team)
 
 
@@ -59,10 +57,11 @@ async def get_team(
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> TeamRead:
     service = TeamService(db)
-    try:
-        team = await service.get_team(team_id)
-    except TeamNotFoundError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+
+    # try:
+    team = await service.get_team(team_id)
+    # except TeamNotFoundError as e:
+    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
     return TeamRead.model_validate(team)
 
 
@@ -75,10 +74,10 @@ async def update_team(
     _: Annotated[None, Depends(require_permission(Permissions.TEAM_MANAGE_MEMBERS))],
 ) -> TeamRead:
     service = TeamService(db)
-    try:
-        team = await service.update_team(team_id=team_id, name=payload.name)
-    except TeamNotFoundError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+    # try:
+    team = await service.update_team(team_id=team_id, name=payload.name)
+    # except TeamNotFoundError as e:
+    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
     return TeamRead.model_validate(team)
 
 
@@ -90,10 +89,10 @@ async def delete_team(
     _: Annotated[None, Depends(require_permission(Permissions.TEAM_DELETE))],
 ) -> None:
     service = TeamService(db)
-    try:
-        await service.delete_team(team_id)
-    except TeamNotFoundError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+    # try:
+    await service.delete_team(team_id)
+    # except TeamNotFoundError as e:
+    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
 
 
 @router.post(
@@ -109,21 +108,21 @@ async def add_team_member(
     _: Annotated[None, Depends(require_permission(Permissions.TEAM_MANAGE_MEMBERS))],
 ) -> TeamMemberRead:
     service = TeamService(db)
-    try:
-        member = await service.add_member(
-            organization_id=organization_id,
-            team_id=team_id,
-            email=payload.email,
-            role=payload.role,
-        )
-    except TeamNotFoundError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
-    except UserNotFoundError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
-    except UserAlreadyTeamMemberError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
-        ) from e
+    # try:
+    member = await service.add_member(
+        organization_id=organization_id,
+        team_id=team_id,
+        email=payload.email,
+        role=payload.role,
+    )
+    # except TeamNotFoundError as e:
+    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+    # except UserNotFoundError as e:
+    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+    # except UserAlreadyTeamMemberError as e:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
+    #     ) from e
     return TeamMemberRead.model_validate(member)
 
 
@@ -134,8 +133,8 @@ async def list_team_members(
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> list[TeamMemberRead]:
     service = TeamService(db)
-    try:
-        members = await service.list_members(team_id)
-    except TeamNotFoundError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+    # try:
+    members = await service.list_members(team_id)
+    # except TeamNotFoundError as e:
+    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
     return [TeamMemberRead.model_validate(m) for m in members]

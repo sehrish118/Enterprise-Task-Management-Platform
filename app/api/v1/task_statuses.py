@@ -24,15 +24,15 @@ async def create_task_status(
     _: Annotated[None, Depends(require_permission(Permissions.PROJECT_MANAGE_MEMBERS))],
 ) -> TaskStatusRead:
     service = TaskStatusService(db)
-    try:
-        result = await service.create_status(
-            organization_id=organization_id,
-            name=payload.name,
-            color=payload.color,
-            position=payload.position,
-        )
-    except TaskStatusAlreadyExistsError as e:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e)) from e
+    # try:
+    result = await service.create_status(
+        organization_id=organization_id,
+        name=payload.name,
+        color=payload.color,
+        position=payload.position,
+    )
+    # except TaskStatusAlreadyExistsError as e:
+    #     raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e)) from e
     return TaskStatusRead.model_validate(result)
 
 

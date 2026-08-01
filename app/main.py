@@ -13,6 +13,7 @@ from app.api.v1 import activity_logs, notifications
 from app.api.v1 import dashboard
 from app.middleware.rate_limit import RateLimitMiddleware
 from app.middleware.request_logging import RequestLoggingMiddleware
+from app.core.exception_handlers import register_exception_handlers
 
 configure_logging()
 
@@ -26,6 +27,8 @@ def create_app() -> FastAPI:
         openapi_url=f"{settings.API_V1_PREFIX}/openapi.json",
         docs_url=f"{settings.API_V1_PREFIX}/docs",
     )
+
+    register_exception_handlers(app)
 
     app.add_middleware(RateLimitMiddleware)
     app.add_middleware(RequestLoggingMiddleware)

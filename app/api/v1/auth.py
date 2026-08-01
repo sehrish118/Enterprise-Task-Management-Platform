@@ -34,12 +34,12 @@ async def register(
     payload: UserCreate, db: Annotated[AsyncSession, Depends(get_db)]
 ) -> UserRead:
     service = AuthService(db)
-    try:
-        user = await service.register(
-            email=payload.email, password=payload.password, full_name=payload.full_name
-        )
-    except EmailAlreadyExistsError as e:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e)) from e
+    # try:
+    user = await service.register(
+        email=payload.email, password=payload.password, full_name=payload.full_name
+    )
+    # except EmailAlreadyExistsError as e:
+    #     raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e)) from e
     return UserRead.model_validate(user)
 
 
@@ -48,14 +48,14 @@ async def login(
     payload: UserLogin, db: Annotated[AsyncSession, Depends(get_db)]
 ) -> Token:
     service = AuthService(db)
-    try:
-        access_token, refresh_token = await service.login(
-            email=payload.email, password=payload.password
-        )
-    except InvalidCredentialsError as e:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e)
-        ) from e
+
+    access_token, refresh_token = await service.login(
+        email=payload.email, password=payload.password
+    )
+    # except InvalidCredentialsError as e:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e)
+    #     ) from e
     return Token(access_token=access_token, refresh_token=refresh_token)
 
 
@@ -64,14 +64,14 @@ async def refresh(
     payload: TokenRefreshRequest, db: Annotated[AsyncSession, Depends(get_db)]
 ) -> Token:
     service = AuthService(db)
-    try:
-        access_token = await service.refresh_access_token(
-            refresh_token=payload.refresh_token
-        )
-    except InvalidTokenError as e:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e)
-        ) from e
+    # try:
+    access_token = await service.refresh_access_token(
+        refresh_token=payload.refresh_token
+    )
+    # except InvalidTokenError as e:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e)
+    #     ) from e
     return Token(access_token=access_token, refresh_token=payload.refresh_token)
 
 

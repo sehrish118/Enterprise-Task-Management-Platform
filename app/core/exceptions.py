@@ -6,6 +6,8 @@ codes. Keeping exceptions here (not scattered per-module) gives one
 place to see every distinct failure mode in the system.
 """
 
+from fastapi import status
+
 
 class DomainError(Exception):
     """Base class for all domain-level exceptions."""
@@ -101,3 +103,33 @@ class NotificationNotFoundError(DomainError):
 
 class NotYourNotificationError(DomainError):
     """Raised when a user tries to mark another user's notification as read."""
+
+
+# Maps each domain exception to its HTTP status code. Add new
+# exceptions here as they're created — this is the single source of
+# truth for exception -> status code translation.
+EXCEPTION_STATUS_MAP: dict[type[DomainError], int] = {
+    EmailAlreadyExistsError: status.HTTP_409_CONFLICT,
+    InvalidCredentialsError: status.HTTP_401_UNAUTHORIZED,
+    InvalidTokenError: status.HTTP_401_UNAUTHORIZED,
+    UserNotFoundError: status.HTTP_404_NOT_FOUND,
+    OrganizationNotFoundError: status.HTTP_404_NOT_FOUND,
+    SlugAlreadyExistsError: status.HTTP_409_CONFLICT,
+    RoleNotFoundError: status.HTTP_400_BAD_REQUEST,
+    UserAlreadyMemberError: status.HTTP_400_BAD_REQUEST,
+    TeamNotFoundError: status.HTTP_404_NOT_FOUND,
+    TeamNameAlreadyExistsError: status.HTTP_409_CONFLICT,
+    UserAlreadyTeamMemberError: status.HTTP_400_BAD_REQUEST,
+    ProjectNotFoundError: status.HTTP_404_NOT_FOUND,
+    ProjectNameAlreadyExistsError: status.HTTP_409_CONFLICT,
+    UserAlreadyProjectMemberError: status.HTTP_400_BAD_REQUEST,
+    TaskNotFoundError: status.HTTP_404_NOT_FOUND,
+    TaskStatusNotFoundError: status.HTTP_400_BAD_REQUEST,
+    TaskStatusAlreadyExistsError: status.HTTP_409_CONFLICT,
+    UserAlreadyAssignedError: status.HTTP_400_BAD_REQUEST,
+    CommentNotFoundError: status.HTTP_404_NOT_FOUND,
+    NotCommentOwnerError: status.HTTP_403_FORBIDDEN,
+    AttachmentNotFoundError: status.HTTP_404_NOT_FOUND,
+    NotificationNotFoundError: status.HTTP_404_NOT_FOUND,
+    NotYourNotificationError: status.HTTP_403_FORBIDDEN,
+}
