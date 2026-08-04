@@ -91,6 +91,7 @@ from app.core.exception_handlers import register_exception_handlers
 from fastapi.staticfiles import StaticFiles
 from app.web.routes import auth as web_auth
 from app.web.routes import dashboard as web_dashboard
+from app.web.routes import organizations as web_organizations
 
 
 configure_logging()
@@ -141,6 +142,8 @@ def create_app() -> FastAPI:
     app.include_router(web_auth.router)
 
     app.include_router(web_dashboard.router)
+
+    app.include_router(web_organizations.router)
 
     logger.info("Application configured", extra={"env": settings.APP_ENV})
     return app
