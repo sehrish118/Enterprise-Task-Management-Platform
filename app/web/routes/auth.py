@@ -50,3 +50,30 @@ async def process_login(
         key="access_token", value=access_token, httponly=True, max_age=1800
     )
     return response
+
+
+from app.core.exceptions import EmailAlreadyExistsError
+
+
+@router.get("/register")
+async def show_register_page(request: Request):
+    return templates.TemplateResponse(request, "register.html")
+
+
+@router.post("/register")
+async def process_register(
+    request: Request,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    full_name: Annotated[str, Form()],
+    email: Annotated[str, Form()],
+    password: Annotated[str, Form()],
+):
+    service = AuthService(db)
+    try:
+        await service.register(email=email, password=password, full_name=full_name)
+    except EmailAlreadyExistsError:
+        return templates.TemplateResponse(
+            request, "register.html", {"error": "Email already registered"}
+        )
+
+    return RedirectResponse(url="/login", status_code=303)
