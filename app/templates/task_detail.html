@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}{{ task.title }} - ETMP{% endblock %}
+{% block content %}
+<a href="/organizations/{{ organization_id }}/projects/{{ task.project_id }}/tasks" class="back-link">← Tasks</a>
+<h2>{{ task.title }}</h2>
+<p>{{ task.description or "No description" }}</p>
+<p>Priority: {{ task.priority }}</p>
+
+<h3>Assign User</h3>
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+<form method="POST" action="/organizations/{{ organization_id }}/tasks/{{ task.id }}/assignees">
+    <label>Email:</label>
+    <input type="email" name="email" required>
+    <button type="submit">Assign</button>
+</form>
+
+<h3>Assignees</h3>
+<ul>
+    {% for a in assignees %}
+    <li>{{ a.user_id }}</li>
+    {% else %}
+    <li>No one assigned yet.</li>
+    {% endfor %}
+</ul>
+
+<h3>Comments</h3>
+{% for comment in comments %}
+<li>{{ comment.content }}</li>
+{% else %}
+<li>No comments yet.</li>
+{% endfor %}
+
+<form method="POST" action="/organizations/{{ organization_id }}/tasks/{{ task.id }}/comments">
+    <label>Add Comment:</label>
+    <input type="text" name="content" required>
+    <button type="submit">Post</button>
+</form>
+{% endblock %}

@@ -94,7 +94,7 @@ from app.web.routes import dashboard as web_dashboard
 from app.web.routes import organizations as web_organizations
 from app.web.routes import teams as web_teams
 from app.web.routes import projects as web_projects
-
+from app.web.routes import tasks as web_tasks
 
 configure_logging()
 
@@ -150,6 +150,8 @@ def create_app() -> FastAPI:
     app.include_router(web_teams.router)
 
     app.include_router(web_projects.router)
+
+    app.include_router(web_tasks.router)
 
     logger.info("Application configured", extra={"env": settings.APP_ENV})
     return app
